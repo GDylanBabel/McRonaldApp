@@ -1,13 +1,13 @@
-package com.helloworld.babel.McRonald;
+package es.neesis.mvcdemo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class McRonaldApplication {
+public class MvcdemoApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(McRonaldApplication.class, args);
+		SpringApplication.run(MvcdemoApplication.class, args);
 	}
 
 }
