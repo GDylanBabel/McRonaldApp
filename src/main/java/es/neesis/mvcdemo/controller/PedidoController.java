@@ -3,49 +3,70 @@ package es.neesis.mvcdemo.controller;
 import es.neesis.mvcdemo.DTO.EmpleadoPedido;
 import es.neesis.mvcdemo.model.Pedido;
 import es.neesis.mvcdemo.model.Producto;
+import es.neesis.mvcdemo.model.ProductoCarta;
 import es.neesis.mvcdemo.model.ProductoPedido;
 import es.neesis.mvcdemo.service.BusinessException;
 import es.neesis.mvcdemo.service.IPedidoService;
 import es.neesis.mvcdemo.service.impl.PedidoService;
+import es.neesis.mvcdemo.utils.ProductoMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping(value = "/pedido")
 public class PedidoController {
 
-    private final IPedidoService pedidoService = new PedidoService();
+    @Autowired
+    private IPedidoService pedidoService;
 
     @GetMapping("/lista")
-    public List<Pedido> getPedidos() {
-        return pedidoService.getPedidos();
+    @ResponseBody
+    public void getPedidos(Model model) {
+        model.addAttribute("pedido", pedidoService.getPedidos());
     }
 
-    @GetMapping("/obtener")
-    public Pedido getPedido(@RequestParam Long pedidoId) throws BusinessException {
-        return pedidoService.getPedido(pedidoId);
+    @GetMapping("/obtener/{pedidoId}")
+    @ResponseBody
+    public void getPedido(@PathVariable Long pedidoId, Model model) throws BusinessException {
+        model.addAttribute("pedido", pedidoService.getPedido(pedidoId));
     }
 
     @PostMapping("/crear")
-    public void crearPedido(@RequestBody List<Producto> productos) {
+    @ResponseBody
+    public void crearPedido(@RequestBody List<ProductoCarta> productosCarta, Model model) {
         Pedido pedido = new Pedido();
-        ProductoPedido productoPedido = new ProductoPedido();
-        //productoPedido.
-        //pedido.setProductos(productos);
+        pedido.setProductos(ProductoMapper.crearProductoPedido(productosCarta));
         pedidoService.crearPedido(pedido);
+        model.addAttribute("pedido", pedidoService.getPedidos());
     }
 
-    @DeleteMapping("/cancelar")
-    public void cancelarPedido(@RequestBody Long longId) throws BusinessException {
-        pedidoService.cancelarPedido(longId);
+    @DeleteMapping("/cancelar/{pedidoId}")
+    @ResponseBody
+    public void cancelarPedido(@PathVariable Long pedidoId, Model model) throws BusinessException {
+        pedidoService.cancelarPedido(pedidoId);
+        model.addAttribute("pedido", pedidoService.getPedidos());
+    }
+
+    @PutMapping("/modificar")
+    @ResponseBody
+    public void modificarPedido(@RequestBody Pedido pedido, Model model) throws BusinessException {
+        pedidoService.modificarPedido(pedido);
+        model.addAttribute("pedido", pedidoService.getPedidos());
     }
 
     @PostMapping("/asignarEmpleado")
-    public void asignarEmpleadoAPedido(@RequestBody EmpleadoPedido empleadoPedido) throws BusinessException {
+    @ResponseBody
+    public void asignarEmpleadoAPedido(@RequestBody EmpleadoPedido empleadoPedido, Model model)
+            throws BusinessException {
         Long empleadoId = empleadoPedido.getEmpleadoId();
         Long pedidoId = empleadoPedido.getPedidoId();
         pedidoService.asignarEmpleadoAPedido(empleadoId, pedidoId);
+        model.addAttribute("pedido", pedidoService.getPedidos());
     }
 
 }

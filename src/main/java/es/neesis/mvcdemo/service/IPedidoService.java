@@ -10,7 +10,7 @@ public interface IPedidoService {
     Pedido getPedido(Long pedidoId) throws BusinessException;
     void crearPedido(Pedido pedido);
     void cancelarPedido(Long pedidoId) throws BusinessException;
-    void modificarPedido(String identificador) throws BusinessException;
+    void modificarPedido(Pedido pedido) throws BusinessException;
     void asignarEmpleadoAPedido(Long empleadoId, Long pedidoId) throws BusinessException;
 
 }

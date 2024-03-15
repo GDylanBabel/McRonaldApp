@@ -3,35 +3,51 @@ package es.neesis.mvcdemo.controller;
 import es.neesis.mvcdemo.model.Producto;
 import es.neesis.mvcdemo.service.BusinessException;
 import es.neesis.mvcdemo.service.IAlmacenService;
-import es.neesis.mvcdemo.service.impl.AlmacenService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping(value = "/almacen")
 public class AlmacenController {
 
-    private final IAlmacenService almacenService = new AlmacenService();
+    @Autowired
+    private IAlmacenService almacenService;
 
-    @GetMapping("/productos")
-    public List<Producto> getProductos() {
-        return almacenService.getProductos();
+    @GetMapping
+    public String inicializacion(Model model) {
+        model.addAttribute("productos", new ArrayList<>());
+        return "almacen";
     }
 
-    @GetMapping("/producto")
-    public Producto getProducto(@RequestParam Long productoId) throws BusinessException {
-        return almacenService.getProducto(productoId);
+    @GetMapping("/productos")
+    @ResponseBody
+    public void getProductos(Model model) {
+        model.addAttribute("productos", almacenService.getProductos());
+    }
+
+    @GetMapping("/producto/{productoId}")
+    @ResponseBody
+    public void getProducto(@PathVariable Long productoId, Model model) throws BusinessException {
+        model.addAttribute("productoSeleccionado", almacenService.getProducto(productoId));
     }
 
     @PostMapping("/addProducto")
-    public void addProducto(@RequestBody Producto producto) {
+    @ResponseBody
+    public void addProducto(@RequestBody Producto producto, Model model) {
         almacenService.addProducto(producto);
+        model.addAttribute("productos", almacenService.getProductos());
     }
 
-    @DeleteMapping("/producto")
-    public void deleteProducto(@RequestBody Producto producto) {
-        almacenService.addProducto(producto);
+    @DeleteMapping("/producto/{productoId}")
+    @ResponseBody
+    public void deleteProducto(@PathVariable Long productoId, Model model) {
+        almacenService.deleteProducto(productoId);
+        model.addAttribute("productos", almacenService.getProductos());
     }
 
 }

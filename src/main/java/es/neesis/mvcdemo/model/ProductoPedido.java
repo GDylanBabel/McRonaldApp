@@ -9,6 +9,9 @@ public class ProductoPedido {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @OneToOne
     private ProductoCarta productoCarta;
+    @ManyToOne
+    private Pedido pedido;
     private Integer productAmount;
 }

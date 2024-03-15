@@ -8,14 +8,22 @@ import es.neesis.mvcdemo.service.BusinessException;
 import es.neesis.mvcdemo.service.IPlantillaService;
 import es.neesis.mvcdemo.utils.BusinessChecks;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
+@Service
 public class PlantillaService implements IPlantillaService {
     @Autowired
     private IEmpleadoRepository empleadoRepository;
     @Autowired
     private IPedidoRepository pedidoRepository;
+
+    @Override
+    public List<Empleado> getEmpleados() {
+        return empleadoRepository.findAll();
+    }
 
     @Override
     public void altaEmpleado(Empleado empleado) {

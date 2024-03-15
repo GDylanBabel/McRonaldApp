@@ -8,10 +8,12 @@ import es.neesis.mvcdemo.service.BusinessException;
 import es.neesis.mvcdemo.service.IPedidoService;
 import es.neesis.mvcdemo.utils.BusinessChecks;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class PedidoService implements IPedidoService {
     @Autowired
     private IPedidoRepository pedidoRepository;
@@ -33,33 +35,52 @@ public class PedidoService implements IPedidoService {
 
     @Override
     public void crearPedido(Pedido pedido) {
-        actualizarUnidadesProductos(pedido.getProductos());
+        actualizarUnidadesProductos(pedido.getProductos(), false);
+        pedido.setPrecioTotal(caclularPrecioPedido(pedido.getProductos()));
         pedidoRepository.save(pedido);
     }
 
-    private void actualizarUnidadesProductos(List<ProductoPedido> productosPedido) {
+    private Double caclularPrecioPedido(List<ProductoPedido> productos) {
+        double precioTotal = 0;
+        for (ProductoPedido productoPedido : productos) {
+            precioTotal += productoPedido.getProductoCarta().getPrecio() * productoPedido.getProductAmount();
+        }
+        return precioTotal;
+    }
+
+    private void actualizarUnidadesProductos(List<ProductoPedido> productosPedido, Boolean esAditivo) {
         for (ProductoPedido productoPedido : productosPedido) {
             ProductoCarta productoCarta = productoPedido.getProductoCarta();
-            actualizarUnidadesProducto(productoCarta.getProducto(), -productoPedido.getProductAmount());
+            int cantidad = esAditivo ? productoPedido.getProductAmount() : - productoPedido.getProductAmount();
+            actualizarUnidadesProducto(productoCarta.getProducto(), cantidad);
         }
     }
 
     private void actualizarUnidadesProducto(Producto producto, Integer unidades) {
         producto.setStockDisponible(producto.getStockDisponible() + unidades);
-        // TODO
+        this.productoRepository.save(producto);
     }
 
     @Override
-    public void cancelarPedido(Long pedidoId) throws BusinessException{
-        // TODO que vuelva a sumar las unidades
+    public void cancelarPedido(Long pedidoId) throws BusinessException {
         Optional<Pedido> pedido = pedidoRepository.findById(pedidoId);
         BusinessChecks.exists(pedido,"El pedido no existe");
+        actualizarUnidadesProductos(pedido.get().getProductos(), true);
         pedidoRepository.delete(pedido.get());
     }
 
+    //Todo Actualizar precio cuando se modifica
     @Override
-    public void modificarPedido(String identificador) throws BusinessException{
-        // TODO
+    public void modificarPedido(Pedido pedido) throws BusinessException{
+        Optional<Pedido> pedidoExistente = pedidoRepository.findById(pedido.getId());
+        BusinessChecks.exists(pedidoExistente,"El pedido no existe");
+
+        pedidoExistente.get().setIdentificador(pedido.getIdentificador());
+        pedidoExistente.get().setEmpleado(pedido.getEmpleado());
+        pedidoExistente.get().setProductos(pedido.getProductos());
+        Double nuevoPrecio = caclularPrecioPedido(pedido.getProductos());
+        pedidoExistente.get().setPrecioTotal(nuevoPrecio);
+        this.pedidoRepository.save(pedidoExistente.get());
     }
 
     @Override

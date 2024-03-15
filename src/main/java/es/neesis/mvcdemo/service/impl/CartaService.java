@@ -8,10 +8,11 @@ import es.neesis.mvcdemo.service.BusinessException;
 import es.neesis.mvcdemo.service.ICartaService;
 import es.neesis.mvcdemo.utils.BusinessChecks;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-
+@Service
 public class CartaService implements ICartaService {
     @Autowired
     private ICartaRepository cartaRepository;

@@ -12,5 +12,6 @@ public class Empleado {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String nombre;
+    @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL)
     private List<Pedido> pedidosAsignados;
 }

@@ -1,9 +1,6 @@
 package es.neesis.mvcdemo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.List;
@@ -15,6 +12,9 @@ public class Pedido {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String identificador;
+    @ManyToOne
     private Empleado empleado;
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
     private List<ProductoPedido> productos;
+    private Double precioTotal;
 }
