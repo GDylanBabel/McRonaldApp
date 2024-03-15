@@ -1,20 +1,17 @@
 package es.neesis.mvcdemo.controller;
 
-import es.neesis.mvcdemo.DTO.EmpleadoPedido;
+import es.neesis.mvcdemo.dto.EmpleadoPedido;
 import es.neesis.mvcdemo.model.Pedido;
-import es.neesis.mvcdemo.model.Producto;
 import es.neesis.mvcdemo.model.ProductoCarta;
-import es.neesis.mvcdemo.model.ProductoPedido;
 import es.neesis.mvcdemo.service.BusinessException;
 import es.neesis.mvcdemo.service.IPedidoService;
-import es.neesis.mvcdemo.service.impl.PedidoService;
+import es.neesis.mvcdemo.utils.DTOMapper;
 import es.neesis.mvcdemo.utils.ProductoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -41,7 +38,7 @@ public class PedidoController {
     public void crearPedido(@RequestBody List<ProductoCarta> productosCarta, Model model) {
         Pedido pedido = new Pedido();
         pedido.setProductos(ProductoMapper.crearProductoPedido(productosCarta));
-        pedidoService.crearPedido(pedido);
+        pedidoService.crearPedido(DTOMapper.pedidoToDTO(pedido));
         model.addAttribute("pedido", pedidoService.getPedidos());
     }
 
@@ -55,7 +52,7 @@ public class PedidoController {
     @PutMapping("/modificar")
     @ResponseBody
     public void modificarPedido(@RequestBody Pedido pedido, Model model) throws BusinessException {
-        pedidoService.modificarPedido(pedido);
+        pedidoService.modificarPedido(DTOMapper.pedidoToDTO(pedido));
         model.addAttribute("pedido", pedidoService.getPedidos());
     }
 

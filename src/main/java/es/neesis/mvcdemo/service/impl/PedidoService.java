@@ -1,5 +1,8 @@
 package es.neesis.mvcdemo.service.impl;
 
+import es.neesis.mvcdemo.dto.PedidoDTO;
+import es.neesis.mvcdemo.dto.ProductoDTO;
+import es.neesis.mvcdemo.dto.ProductoPedidoDTO;
 import es.neesis.mvcdemo.model.*;
 import es.neesis.mvcdemo.repository.IEmpleadoRepository;
 import es.neesis.mvcdemo.repository.IPedidoRepository;
@@ -7,6 +10,7 @@ import es.neesis.mvcdemo.repository.IProductoRepository;
 import es.neesis.mvcdemo.service.BusinessException;
 import es.neesis.mvcdemo.service.IPedidoService;
 import es.neesis.mvcdemo.utils.BusinessChecks;
+import es.neesis.mvcdemo.utils.DTOMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,20 +25,22 @@ public class PedidoService implements IPedidoService {
     private IEmpleadoRepository empleadoRepository;
     @Autowired
     private IProductoRepository productoRepository;
+
     @Override
-    public List<Pedido> getPedidos() {
-        return pedidoRepository.findAll();
+    public List<PedidoDTO> getPedidos() {
+        return DTOMapper.pedidoListToDTO(pedidoRepository.findAll());
     }
 
     @Override
-    public Pedido getPedido(Long pedidoId) throws BusinessException {
+    public PedidoDTO getPedido(Long pedidoId) throws BusinessException {
         Optional<Pedido> pedido = pedidoRepository.findById(pedidoId);
-        BusinessChecks.exists(pedido,"El pedido no existe");
-        return pedido.get();
+        BusinessChecks.exists(pedido, "El pedido no existe");
+        return DTOMapper.pedidoToDTO(pedido.get());
     }
 
     @Override
-    public void crearPedido(Pedido pedido) {
+    public void crearPedido(PedidoDTO pedidoDTO) {
+        Pedido pedido = DTOMapper.dtoToPedido(pedidoDTO);
         actualizarUnidadesProductos(pedido.getProductos(), false);
         pedido.setPrecioTotal(caclularPrecioPedido(pedido.getProductos()));
         pedidoRepository.save(pedido);
@@ -51,7 +57,7 @@ public class PedidoService implements IPedidoService {
     private void actualizarUnidadesProductos(List<ProductoPedido> productosPedido, Boolean esAditivo) {
         for (ProductoPedido productoPedido : productosPedido) {
             ProductoCarta productoCarta = productoPedido.getProductoCarta();
-            int cantidad = esAditivo ? productoPedido.getProductAmount() : - productoPedido.getProductAmount();
+            int cantidad = esAditivo ? productoPedido.getProductAmount() : -productoPedido.getProductAmount();
             actualizarUnidadesProducto(productoCarta.getProducto(), cantidad);
         }
     }
@@ -64,16 +70,18 @@ public class PedidoService implements IPedidoService {
     @Override
     public void cancelarPedido(Long pedidoId) throws BusinessException {
         Optional<Pedido> pedido = pedidoRepository.findById(pedidoId);
-        BusinessChecks.exists(pedido,"El pedido no existe");
+        BusinessChecks.exists(pedido, "El pedido no existe");
         actualizarUnidadesProductos(pedido.get().getProductos(), true);
         pedidoRepository.delete(pedido.get());
     }
 
     //Todo Actualizar precio cuando se modifica
     @Override
-    public void modificarPedido(Pedido pedido) throws BusinessException{
+    public void modificarPedido(PedidoDTO pedidoDTO) throws BusinessException {
+        Pedido pedido = DTOMapper.dtoToPedido(pedidoDTO);
+
         Optional<Pedido> pedidoExistente = pedidoRepository.findById(pedido.getId());
-        BusinessChecks.exists(pedidoExistente,"El pedido no existe");
+        BusinessChecks.exists(pedidoExistente, "El pedido no existe");
 
         pedidoExistente.get().setIdentificador(pedido.getIdentificador());
         pedidoExistente.get().setEmpleado(pedido.getEmpleado());
@@ -86,10 +94,10 @@ public class PedidoService implements IPedidoService {
     @Override
     public void asignarEmpleadoAPedido(Long empleadoId, Long pedidoId) throws BusinessException {
         Optional<Empleado> empleado = empleadoRepository.findById(empleadoId);
-        BusinessChecks.exists(empleado,"El empleado no existe");
+        BusinessChecks.exists(empleado, "El empleado no existe");
 
         Optional<Pedido> pedido = pedidoRepository.findById(pedidoId);
-        BusinessChecks.exists(pedido,"El pedido no existe");
+        BusinessChecks.exists(pedido, "El pedido no existe");
 
         pedido.get().setEmpleado(empleado.get());
         empleado.get().getPedidosAsignados().add(pedido.get());

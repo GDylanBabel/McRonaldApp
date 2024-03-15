@@ -1,10 +1,12 @@
 package es.neesis.mvcdemo.service.impl;
 
+import es.neesis.mvcdemo.dto.ProductoDTO;
 import es.neesis.mvcdemo.model.Producto;
 import es.neesis.mvcdemo.repository.IProductoRepository;
 import es.neesis.mvcdemo.service.BusinessException;
 import es.neesis.mvcdemo.service.IAlmacenService;
 import es.neesis.mvcdemo.utils.BusinessChecks;
+import es.neesis.mvcdemo.utils.DTOMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,21 +20,21 @@ public class AlmacenService implements IAlmacenService {
     private IProductoRepository productoRepository;
 
     @Override
-    public List<Producto> getProductos() {
-        return productoRepository.findAll();
+    public List<ProductoDTO> getProductos() {
+        return DTOMapper.productoListToDTO(productoRepository.findAll());
     }
 
     @Override
-    public Producto getProducto(Long productoId) throws BusinessException {
+    public ProductoDTO getProducto(Long productoId) throws BusinessException {
         Optional<Producto> producto = productoRepository.findById(productoId);
-        BusinessChecks.exists(producto,"El producto no existe");
+        BusinessChecks.exists(producto, "El producto no existe");
 
-        return producto.get();
+        return DTOMapper.productoToDTO(producto.get());
     }
 
     @Override
-    public void addProducto(Producto producto) {
-        productoRepository.save(producto);
+    public void addProducto(ProductoDTO producto) {
+        productoRepository.save(DTOMapper.dtoToProducto(producto));
     }
 
     @Override

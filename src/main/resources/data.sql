@@ -1,3 +1,40 @@
+DROP ALL OBJECTS DELETE FILES;
+
+CREATE TABLE Empleado (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(255)
+);
+
+CREATE TABLE Producto (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(255),
+    stockDisponible INT
+);
+
+CREATE TABLE ProductoCarta (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    producto_id BIGINT,
+    precio DOUBLE,
+    FOREIGN KEY (producto_id) REFERENCES Producto(id)
+);
+
+CREATE TABLE Pedido (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    identificador VARCHAR(255),
+    empleado_id BIGINT,
+    precioTotal DOUBLE,
+    FOREIGN KEY (empleado_id) REFERENCES Empleado(id)
+);
+
+CREATE TABLE ProductoPedido (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    productoCarta_id BIGINT,
+    pedido_id BIGINT,
+    productAmount INT,
+    FOREIGN KEY (productoCarta_id) REFERENCES ProductoCarta(id),
+    FOREIGN KEY (pedido_id) REFERENCES Pedido(id)
+);
+
 -- Crear empleados
 INSERT INTO Empleado (nombre) VALUES ('Juan'), ('María'), ('Carlos');
 

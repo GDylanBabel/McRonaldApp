@@ -1,8 +1,10 @@
 package es.neesis.mvcdemo.controller;
 
+import es.neesis.mvcdemo.dto.ProductoDTO;
 import es.neesis.mvcdemo.model.Producto;
 import es.neesis.mvcdemo.service.BusinessException;
 import es.neesis.mvcdemo.service.IAlmacenService;
+import es.neesis.mvcdemo.utils.DTOMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,7 +40,7 @@ public class AlmacenController {
 
     @PostMapping("/addProducto")
     @ResponseBody
-    public void addProducto(@RequestBody Producto producto, Model model) {
+    public void addProducto(@RequestBody ProductoDTO producto, Model model) {
         almacenService.addProducto(producto);
         model.addAttribute("productos", almacenService.getProductos());
     }

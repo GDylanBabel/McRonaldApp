@@ -4,6 +4,7 @@ import es.neesis.mvcdemo.model.Empleado;
 import es.neesis.mvcdemo.service.BusinessException;
 import es.neesis.mvcdemo.service.IPlantillaService;
 import es.neesis.mvcdemo.service.impl.PlantillaService;
+import es.neesis.mvcdemo.utils.DTOMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,10 +21,11 @@ public class PlantillaController {
 
     @GetMapping
     public String inicializacion(Model model) {
-        if(model.getAttribute("plantilla") != null){
+        if (model.getAttribute("plantilla") != null) {
             model.addAttribute("plantilla", model.getAttribute("plantilla"));
+        } else {
+            model.addAttribute("plantilla", new ArrayList<>());
         }
-        model.addAttribute("plantilla", new ArrayList<>());
         return "plantilla";
     }
 
@@ -36,7 +38,7 @@ public class PlantillaController {
     @PostMapping("/addEmpleado")
     @ResponseBody
     public void addEmpleado(@RequestBody Empleado empleado, Model model) {
-        plantillaService.altaEmpleado(empleado);
+        plantillaService.altaEmpleado(DTOMapper.empladoToDTO(empleado));
         model.addAttribute("plantilla", plantillaService.getEmpleados());
     }
 

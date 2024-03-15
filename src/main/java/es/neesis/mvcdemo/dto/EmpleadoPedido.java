@@ -1,4 +1,4 @@
-package es.neesis.mvcdemo.DTO;
+package es.neesis.mvcdemo.dto;
 
 import lombok.Data;
 

@@ -31,16 +31,13 @@
             body: JSON.stringify(empleado)
         })
         .then(response => response.json())
-        .then(data => {
-            actualizarListaEmpleados(data);
-        })
         .catch(error => console.error('Error:', error));
     }
 
     function actualizarListaEmpleados(empleados) {
         var empleadosList = document.getElementById('empleadosList');
         empleadosList.innerHTML = '';
-
+        console.log(empleados);
         empleados.forEach(function(empleado) {
             var li = document.createElement('li');
             li.textContent = empleado.nombre;
@@ -51,6 +48,7 @@
     fetch('/plantilla/empleados')
     .then(response => response.json())
     .then(data => {
+    console.log(data);
         actualizarListaEmpleados(data);
     })
     .catch(error => console.error('Error:', error));

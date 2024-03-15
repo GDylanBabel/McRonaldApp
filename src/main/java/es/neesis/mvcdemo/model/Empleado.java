@@ -14,4 +14,8 @@ public class Empleado {
     private String nombre;
     @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL)
     private List<Pedido> pedidosAsignados;
+
+    public String toString() {
+        return nombre;
+    }
 }
